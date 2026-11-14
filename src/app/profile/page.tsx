@@ -101,6 +101,7 @@ export default function ProfilePage() {
                     src={user.image}
                     alt={user.name || "Profile"}
                     fill
+                    sizes="64px"
                     className="object-cover"
                   />
                 ) : (
