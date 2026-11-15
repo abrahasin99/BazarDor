@@ -20,7 +20,7 @@ const Navbar = () => {
   const { data: session, isPending } = authClient.useSession();
 
   return (
-    <div className="flex gap-2 items-center justify-between p-4 px-30">
+    <div className="flex gap-2 items-center justify-between p-8 px-30">
       {/* Logo + Website Info */}
       <div className="flex gap-2">
         <Link href={"/"}>

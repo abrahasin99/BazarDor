@@ -3,3 +3,9 @@
    themes: light --default;
  }
 @import "@heroui/styles"; 
+
+@layer components {
+  .surface {
+    @apply bg-white;
+  }
+}

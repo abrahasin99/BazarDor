@@ -5,13 +5,12 @@ import Image from "next/image";
 import { authClient, useSession, signOut } from "@/lib/auth-client";
 import { LogOut } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import error from "next/error";
 
 export default function ProfilePage() {
-  const {
-    data: session,
-    isPending,
-    refetch,
-  } = useSession();
+  const router = useRouter();
+  const { data: session, isPending, refetch } = useSession();
 
   const [name, setName] = useState("");
 
@@ -75,9 +74,22 @@ export default function ProfilePage() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-  };
+    try {
+      const { error } = await signOut();
 
+      if (error) {
+        toast.error("সাইন আউট করা যায়নি");
+        return;
+      }
+
+      toast.success("সফলভাবে সাইন আউট হয়েছে");
+
+      router.replace("/sign-in");
+      router.refresh();
+    } catch (err) {
+      toast.error("সাইন আউট করা যায়নি");
+    }
+  };
   return (
     <main className="min-h-screen bg-[#f3f8f4] px-4 py-10">
       <div className="mx-auto max-w-3xl">

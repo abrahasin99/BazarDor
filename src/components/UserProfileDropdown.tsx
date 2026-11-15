@@ -70,9 +70,7 @@ export default function UserProfileDropdown() {
         </div>
 
         {/* First name */}
-        <span className="text-sm font-medium text-gray-800">
-          {firstName}
-        </span>
+        <span className="text-sm font-medium text-gray-800">{firstName}</span>
 
         <ChevronDown
           size={15}
@@ -85,16 +83,11 @@ export default function UserProfileDropdown() {
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-
           {/* Full name + email */}
           <div className="border-b border-gray-100 px-4 py-4">
-            <p className="text-sm font-semibold text-gray-900">
-              {user.name}
-            </p>
+            <p className="text-sm font-semibold text-gray-900">{user.name}</p>
 
-            <p className="mt-1 text-xs text-gray-500">
-              {user.email}
-            </p>
+            <p className="mt-1 text-xs text-gray-500">{user.email}</p>
           </div>
 
           {/* Menu */}
