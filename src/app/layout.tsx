@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn">
-      <body className="min-h-screen suppressHydrationWarning">
+      <body className="min-h-screen" suppressHydrationWarning>
         <Toaster />
         {children}
       </body>
