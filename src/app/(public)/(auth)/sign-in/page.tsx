@@ -11,19 +11,14 @@ import {
   Separator,
   TextField,
 } from "@heroui/react";
-import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
 function GoogleIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M21.35 12.27c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.39z"
@@ -61,6 +56,18 @@ function GithubIcon() {
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
 
+  const getCallbackURL = () => {
+    return (
+      new URLSearchParams(window.location.search).get("callbackURL") || "/"
+    );
+  };
+
+  const addLoginSuccess = (url: string) => {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}login=success`;
+  };
+
+  // Email + Password
   const handleSubmit = async (
     e: React.SyntheticEvent<HTMLFormElement>
   ) => {
@@ -69,33 +76,53 @@ export default function SignInPage() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
 
-    const { data: resData, error } = await signIn.email({
+    const callbackURL = addLoginSuccess(getCallbackURL());
+
+    const { error } = await signIn.email({
       email: data.email as string,
       password: data.password as string,
-      callbackURL: "/",
+      callbackURL,
     });
 
     if (error) {
       toast.error(error.message as string);
+      return;
+    }
+
+    // If Better Auth does not redirect,
+    // show the toast here.
+    toast.success("সফলভাবে সাইন ইন করেছেন!", {
+      duration: 4000,
+    });
+  };
+
+  // Google
+  const handleGoogleSignIn = async () => {
+    const callbackURL = addLoginSuccess(getCallbackURL());
+
+    const { error } = await signIn.social({
+      provider: "google",
+      callbackURL,
+    });
+
+    if (error) {
+      toast.error(error.message as string);
+      return;
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    const data = await signIn.social({
-      provider: "google",
-    });
-
-    console.log(data);
-  };
-
+  // GitHub
   const handleGithubSignIn = async () => {
+    const callbackURL = addLoginSuccess(getCallbackURL());
+
     const { error } = await signIn.social({
       provider: "github",
-      callbackURL: "/",
+      callbackURL,
     });
 
     if (error) {
       toast.error(error.message as string);
+      return;
     }
   };
 
@@ -159,9 +186,7 @@ export default function SignInPage() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setIsVisible((prev) => !prev)
-                  }
+                  onClick={() => setIsVisible((prev) => !prev)}
                   className="absolute right-3 text-[#737c74] hover:text-green-700 focus:outline-none transition-colors"
                   aria-label="Toggle password visibility"
                 >
@@ -248,7 +273,6 @@ export default function SignInPage() {
             className="flex items-center gap-1.5 text-sm text-[#7b857d] hover:text-green-700 transition"
           >
             <ArrowLeft size={14} />
-
             <span>হোম পেজে ফিরে যান</span>
           </Link>
         </Card.Footer>

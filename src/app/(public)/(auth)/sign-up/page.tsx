@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -36,9 +36,24 @@ export default function SignUpPage() {
   const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (
-    e: React.SyntheticEvent<HTMLFormElement>
-  ) => {
+  /*
+   * Google/GitHub redirect away from this page.
+   * This checks whether the user came back after
+   * successfully completing social signup.
+   */
+  useEffect(() => {
+    const signupSuccess = sessionStorage.getItem("signupSuccess");
+
+    if (signupSuccess === "true") {
+      sessionStorage.removeItem("signupSuccess");
+
+      toast.success("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!", {
+        duration: 4000,
+      });
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPasswordError("");
 
@@ -62,7 +77,10 @@ export default function SignUpPage() {
     }
 
     if (resData?.user) {
-      toast.success("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। সাইন ইন করুন।");
+      toast.success("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। সাইন ইন করুন।", {
+        duration: 4000,
+      });
+
       router.push("/sign-in");
     }
   };
@@ -75,21 +93,32 @@ export default function SignUpPage() {
 
     if (error) {
       toast.error(error.message as string);
+      return;
     }
+
+    /*
+     * OAuth redirects away from this page,
+     * so save the success state before leaving.
+     */
+    sessionStorage.setItem("signupSuccess", "true");
   };
 
   const handleGithubSignUp = async () => {
     const { error } = await signIn.social({
       provider: "github",
       callbackURL: "/",
-      additionalParams: {
-        prompt: "select_account",
-      },
     });
 
     if (error) {
       toast.error(error.message as string);
+      return;
     }
+
+    /*
+     * OAuth redirects away from this page,
+     * so save the success state before leaving.
+     */
+    sessionStorage.setItem("signupSuccess", "true");
   };
 
   return (
@@ -101,7 +130,8 @@ export default function SignUpPage() {
         </h1>
 
         <p className="text-sm text-[#737c74]">
-          বিস্তারিত দাম, বাজার তথ্য ও প্রয়োজনীয় তথ্য পেতে অ্যাকাউন্ট তৈরি করুন।
+          বিস্তারিত দাম, বাজার তথ্য ও প্রয়োজনীয় তথ্য পেতে অ্যাকাউন্ট তৈরি
+          করুন।
         </p>
       </div>
 
@@ -202,9 +232,7 @@ export default function SignUpPage() {
               </div>
 
               {passwordError ? (
-                <span className="text-xs text-red-500">
-                  {passwordError}
-                </span>
+                <span className="text-xs text-red-500">{passwordError}</span>
               ) : (
                 <FieldError className="text-xs text-red-500" />
               )}
