@@ -163,9 +163,11 @@ export default function CategoryPage({
               className="appearance-none rounded-lg border border-gray-200 bg-white py-2 pl-3 pr-9 text-xs font-medium text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
             >
               <option value="default">ডিফল্ট</option>
+
               <option value="low-to-high">
                 দাম: কম থেকে বেশি
               </option>
+
               <option value="high-to-low">
                 দাম: বেশি থেকে কম
               </option>
@@ -179,10 +181,11 @@ export default function CategoryPage({
         </div>
 
         {/* Product Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 pb-5 sm:grid-cols-2 lg:grid-cols-3">
           {sortedProducts.map((product) => (
             <PriceCard
               key={product.id}
+              productId={product.id}
               nameBn={product.nameBn}
               today={bengaliToNumber(product.today)}
               unit={product.unit}

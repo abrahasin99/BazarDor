@@ -64,6 +64,7 @@ export default function PriceSections() {
       {items.map((product) => (
         <PriceCard
           key={product.id}
+          productId={product.id}
           nameBn={product.nameBn}
           today={product.today}
           unit={product.unit}
@@ -75,13 +76,14 @@ export default function PriceSections() {
   );
 
   return (
-    <section className="px-4 py-8 sm:px-6 lg:px-8 bg-[#f0f5f0]">
+    <section className="bg-[#f0f5f0] px-4 py-8 sm:px-6 lg:px-8">
 
       {/* আজকে দাম বেড়েছে */}
       <div className="mx-auto max-w-7xl">
         <div className="mb-4 flex items-center gap-1.5">
           <CaretUp
-            width={18} height={18}
+            width={18}
+            height={18}
             className="text-red-500"
           />
 
@@ -94,10 +96,11 @@ export default function PriceSections() {
       </div>
 
       {/* আজকে দাম কমেছে */}
-      <div className="mt-10 mx-auto max-w-7xl">
+      <div className="mx-auto mt-10 max-w-7xl">
         <div className="mb-4 flex items-center gap-1.5">
           <CaretDown
-            width={18} height={18}
+            width={18}
+            height={18}
             className="text-green-600"
           />
 
@@ -110,11 +113,17 @@ export default function PriceSections() {
       </div>
 
       {/* সব পণ্য */}
-      <div className="mt-10 mx-auto max-w-7xl" id ="price-movers">
+      <div
+        id="price-movers"
+        className="mx-auto mt-10 max-w-7xl"
+      >
         <h2 className="mb-2 text-xl font-bold text-gray-900">
           সব পণ্য
         </h2>
-        <p className="text-xs font-normal pb-4 text-gray-500">মোট ৩৩টি পণ্য দেখানো হচ্ছে</p>
+
+        <p className="pb-4 text-xs font-normal text-gray-500">
+          মোট ৩৩টি পণ্য দেখানো হচ্ছে
+        </p>
 
         {renderProducts(allProducts)}
       </div>

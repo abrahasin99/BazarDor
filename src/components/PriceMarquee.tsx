@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import Marquee from "react-fast-marquee";
 import { CaretUp, CaretDown } from "@gravity-ui/icons";
 import { toBanglaNumber, toBanglaUnit } from "../../src/app/Banglahelper";
@@ -10,7 +11,7 @@ interface Product {
     dir: "up" | "down" | "flat";
     pct: number;
   };
-  categoryIcon: ReactNode;
+  categoryIcon: string;
   id: string;
   nameBn: string;
   today: number;
@@ -26,14 +27,15 @@ export default function PriceMarquee() {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          "https://openapi.programming-hero.com/api/bazardor/products"
+          "https://openapi.programming-hero.com/api/bazardor/products",
         );
 
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
 
-        const data = await response.json();
+        const data: Product[] = await response.json();
+
         setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -51,41 +53,37 @@ export default function PriceMarquee() {
 
   return (
     <div className="border-b border-gray-200 bg-white">
-      <Marquee
-        speed={65}
-        pauseOnHover={true}
-        gradient={false}
-      >
+      <Marquee speed={65} pauseOnHover={true} gradient={false}>
         {products
           .filter((product) => product.change.dir !== "flat")
           .map((product) => (
-            <div
+            <Link
               key={product.id}
-              className="mx-5 flex shrink-0 items-center gap-2 py-1"
+              href={`/products/${product.id}`}
+              className="mx-5 flex shrink-0 items-center gap-2 py-1 transition-opacity hover:opacity-70"
             >
               <span>{product.categoryIcon}</span>
 
-              <span className="font-medium text-lg">{product.nameBn}</span>
+              <span className="text-lg font-medium">{product.nameBn}</span>
 
-              <span className="font-normal text-base">
-                ৳ {toBanglaNumber(product.today)}/
-                {toBanglaUnit(product.unit)}
+              <span className="text-base font-normal">
+                ৳ {toBanglaNumber(product.today)}/{toBanglaUnit(product.unit)}
               </span>
 
               {product.change.dir === "down" ? (
-                <span className="flex items-center text-red-500 text-sm">
-                  <CaretDown />
+                <span className="flex items-center text-sm text-red-500">
+                  <CaretDown width={16} height={16} />
                   {toBanglaNumber(Math.abs(product.change.pct))}%
                 </span>
               ) : (
-                <span className="flex items-center text-green-600 text-sm">
-                  <CaretUp />
+                <span className="flex items-center text-sm text-green-600">
+                  <CaretUp width={16} height={16} />
                   {toBanglaNumber(Math.abs(product.change.pct))}%
                 </span>
               )}
 
               <span className="text-gray-300">|</span>
-            </div>
+            </Link>
           ))}
       </Marquee>
     </div>
