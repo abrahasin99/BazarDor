@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -41,21 +42,28 @@ export default function CategoryBar() {
   }, []);
 
   if (loading) {
-  return (
-    <div className="border-b border-gray-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-2.5">
-        <p className="text-center text-sm text-gray-400">
-          ক্যাটাগরি লোড হচ্ছে...
-        </p>
+    return (
+      <div className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-8">
+          <p className="text-center text-xs text-gray-400 sm:text-sm">
+            ক্যাটাগরি লোড হচ্ছে...
+          </p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="flex gap-7 overflow-x-auto py-2.5">
+    <nav className="w-full border-b border-gray-200 bg-white">
+      <div className="mx-auto max-w-6xl px-3 sm:px-6 lg:px-8">
+        <div
+          className="flex items-center gap-2 overflow-x-auto py-2.5 sm:gap-3 sm:py-3"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
           {categories.map((category) => {
             const isActive = pathname === `/category/${category.slug}`;
 
@@ -63,13 +71,16 @@ export default function CategoryBar() {
               <Link
                 key={category.id}
                 href={`/category/${category.slug}`}
-                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-2xl px-2 py-2 text-xs font-medium transition ${
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium transition sm:rounded-2xl sm:px-3.5 sm:py-2.5 sm:text-sm ${
                   isActive
                     ? "bg-green-800 text-white"
-                    : "text-gray-700 hover:bg-gray-200 hover:text-green-600"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-green-700"
                 }`}
               >
-                <span>{category.icon}</span>
+                <span className="text-sm sm:text-base">
+                  {category.icon}
+                </span>
+
                 <span>{category.nameBn}</span>
               </Link>
             );

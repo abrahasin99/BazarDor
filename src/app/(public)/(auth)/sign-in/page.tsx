@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -55,6 +56,10 @@ function GithubIcon() {
 
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "github" | null>(
+    null
+  );
 
   const getCallbackURL = () => {
     return (
@@ -73,94 +78,119 @@ export default function SignInPage() {
   ) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
 
     const callbackURL = addLoginSuccess(getCallbackURL());
 
-    const { error } = await signIn.email({
-      email: data.email as string,
-      password: data.password as string,
-      callbackURL,
-    });
+    try {
+      setIsSubmitting(true);
 
-    if (error) {
-      toast.error(error.message as string);
-      return;
+      const { error } = await signIn.email({
+        email: data.email as string,
+        password: data.password as string,
+        callbackURL,
+      });
+
+      if (error) {
+        toast.error(error.message as string);
+        return;
+      }
+
+      toast.success("সফলভাবে সাইন ইন করেছেন!", {
+        duration: 4000,
+      });
+    } catch {
+      toast.error("সাইন ইন করার সময় সমস্যা হয়েছে!");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // If Better Auth does not redirect,
-    // show the toast here.
-    toast.success("সফলভাবে সাইন ইন করেছেন!", {
-      duration: 4000,
-    });
   };
 
   // Google
   const handleGoogleSignIn = async () => {
+    if (socialLoading) return;
+
     const callbackURL = addLoginSuccess(getCallbackURL());
 
-    const { error } = await signIn.social({
-      provider: "google",
-      callbackURL,
-    });
+    try {
+      setSocialLoading("google");
 
-    if (error) {
-      toast.error(error.message as string);
-      return;
+      const { error } = await signIn.social({
+        provider: "google",
+        callbackURL,
+      });
+
+      if (error) {
+        toast.error(error.message as string);
+      }
+    } catch {
+      toast.error("Google দিয়ে সাইন ইন করা যায়নি!");
+      setSocialLoading(null);
     }
   };
 
   // GitHub
   const handleGithubSignIn = async () => {
+    if (socialLoading) return;
+
     const callbackURL = addLoginSuccess(getCallbackURL());
 
-    const { error } = await signIn.social({
-      provider: "github",
-      callbackURL,
-    });
+    try {
+      setSocialLoading("github");
 
-    if (error) {
-      toast.error(error.message as string);
-      return;
+      const { error } = await signIn.social({
+        provider: "github",
+        callbackURL,
+      });
+
+      if (error) {
+        toast.error(error.message as string);
+        setSocialLoading(null);
+      }
+    } catch {
+      toast.error("GitHub দিয়ে সাইন ইন করা যায়নি!");
+      setSocialLoading(null);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#f0f5f0] flex flex-col items-center justify-center px-4 py-8 text-[#1f2923]">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#f0f5f0] px-3 py-6 text-[#1f2923] sm:px-6 sm:py-10">
       {/* Heading */}
-      <div className="text-center mb-7">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+      <div className="mb-5 w-full max-w-[432px] text-center sm:mb-7">
+        <h1 className="mb-2 text-2xl font-bold sm:text-3xl">
           সাইন ইন
         </h1>
 
-        <p className="text-sm text-[#737c74]">
+        <p className="mx-auto max-w-md text-xs leading-5 text-[#737c74] sm:text-sm sm:leading-6">
           বিস্তারিত দাম, বাজার তথ্য ও প্রয়োজনীয় তথ্য পেতে অ্যাকাউন্টে ঢুকুন।
         </p>
       </div>
 
       {/* Sign In Card */}
-      <Card className="w-full max-w-[432px] bg-[#fbfdfb] border border-[#dce5dc] rounded-2xl p-6 sm:p-7 shadow-none">
+      <Card className="w-full max-w-[432px] rounded-xl border border-[#dce5dc] bg-[#fbfdfb] p-4 shadow-none sm:rounded-2xl sm:p-7">
         <Card.Content className="flex flex-col gap-4 p-0">
           <Form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-4"
+            className="flex w-full flex-col gap-4"
           >
             {/* Email */}
             <TextField
               name="email"
               type="email"
               isRequired
-              className="flex flex-col gap-2 w-full"
+              className="flex w-full flex-col gap-2"
             >
               <Label className="block text-sm font-medium text-[#1f2923]">
                 ইমেইল
               </Label>
 
-              <div className="relative flex items-center">
+              <div className="relative flex w-full items-center">
                 <Input
                   placeholder="you@example.com"
-                  className="w-full h-[42px] px-3 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
+                  className="h-[44px] w-full rounded-lg border border-[#dce5dc] bg-transparent px-3 text-sm text-[#1f2923] outline-none transition placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:bg-transparent focus:ring-2 focus:ring-green-100"
                 />
               </div>
 
@@ -172,23 +202,25 @@ export default function SignInPage() {
               name="password"
               type={isVisible ? "text" : "password"}
               isRequired
-              className="flex flex-col gap-2 w-full"
+              className="flex w-full flex-col gap-2"
             >
               <Label className="block text-sm font-medium text-[#1f2923]">
                 পাসওয়ার্ড
               </Label>
 
-              <div className="relative flex items-center">
+              <div className="relative flex w-full items-center">
                 <Input
                   placeholder="কমপক্ষে ৮ অক্ষরের"
-                  className="w-full h-[42px] px-3 pr-10 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
+                  className="h-[44px] w-full rounded-lg border border-[#dce5dc] bg-transparent px-3 pr-10 text-sm text-[#1f2923] outline-none transition placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:bg-transparent focus:ring-2 focus:ring-green-100"
                 />
 
                 <button
                   type="button"
                   onClick={() => setIsVisible((prev) => !prev)}
-                  className="absolute right-3 text-[#737c74] hover:text-green-700 focus:outline-none transition-colors"
-                  aria-label="Toggle password visibility"
+                  className="absolute right-3 text-[#737c74] transition-colors hover:text-green-700 focus:outline-none"
+                  aria-label={
+                    isVisible ? "Hide password" : "Show password"
+                  }
                 >
                   {isVisible ? (
                     <EyeOff size={18} />
@@ -202,7 +234,7 @@ export default function SignInPage() {
             </TextField>
 
             {/* Forgot Password */}
-            <div className="w-full text-right -mt-1">
+            <div className="-mt-1 w-full text-right">
               <Link
                 href="/forgot-password"
                 className="text-xs text-[#078b42] hover:underline"
@@ -215,17 +247,18 @@ export default function SignInPage() {
             <Button
               type="submit"
               variant="primary"
-              className="w-full h-[43px] bg-[#078b42] hover:bg-[#067638] text-white font-semibold text-sm rounded-lg shadow-md shadow-green-800/20 transition duration-200 active:scale-[0.99]"
+              isDisabled={isSubmitting || !!socialLoading}
+              className="h-[44px] w-full rounded-lg bg-[#078b42] text-sm font-semibold text-white shadow-md shadow-green-800/20 transition duration-200 hover:bg-[#067638] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              সাইন ইন
+              {isSubmitting ? "সাইন ইন হচ্ছে..." : "সাইন ইন"}
             </Button>
           </Form>
 
           {/* Divider */}
-          <div className="w-full flex items-center gap-4">
+          <div className="flex w-full items-center gap-3 sm:gap-4">
             <Separator className="flex-1 bg-[#dce5dc]" />
 
-            <span className="text-xs text-[#737c74]">
+            <span className="shrink-0 text-xs text-[#737c74]">
               অথবা
             </span>
 
@@ -238,31 +271,41 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              disabled={!!socialLoading || isSubmitting}
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
             >
               <GoogleIcon />
-              Continue with Google
+              <span>
+                {socialLoading === "google"
+                  ? "Connecting to Google..."
+                  : "Continue with Google"}
+              </span>
             </button>
 
             {/* GitHub */}
             <button
               type="button"
               onClick={handleGithubSignIn}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              disabled={!!socialLoading || isSubmitting}
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
             >
               <GithubIcon />
-              Continue with GitHub
+              <span>
+                {socialLoading === "github"
+                  ? "Connecting to GitHub..."
+                  : "Continue with GitHub"}
+              </span>
             </button>
           </div>
         </Card.Content>
 
         {/* Footer */}
         <Card.Footer className="flex flex-col items-center gap-4 p-0 pt-5">
-          <p className="text-center text-sm text-[#1f2923]">
+          <p className="text-center text-xs leading-5 text-[#1f2923] sm:text-sm">
             অ্যাকাউন্ট নেই?{" "}
             <Link
               href="/sign-up"
-              className="text-[#078b42] font-medium hover:underline"
+              className="font-medium text-[#078b42] hover:underline"
             >
               সাইন আপ করুন
             </Link>
@@ -270,7 +313,7 @@ export default function SignInPage() {
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-[#7b857d] hover:text-green-700 transition"
+            className="flex items-center gap-1.5 text-xs text-[#7b857d] transition hover:text-green-700 sm:text-sm"
           >
             <ArrowLeft size={14} />
             <span>হোম পেজে ফিরে যান</span>

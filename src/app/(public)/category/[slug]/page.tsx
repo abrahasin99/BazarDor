@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -52,9 +53,7 @@ function bengaliToNumber(value: number | string): number {
   return Number(englishValue);
 }
 
-export default function CategoryPage({
-  params,
-}: PageProps) {
+export default function CategoryPage({ params }: PageProps) {
   const [slug, setSlug] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +88,7 @@ export default function CategoryPage({
         setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -114,8 +114,8 @@ export default function CategoryPage({
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-7xl px-4 py-6">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+      <main className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-6 sm:py-6 lg:px-8">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center sm:rounded-2xl sm:p-8">
           <p className="text-sm text-gray-500">
             পণ্য লোড হচ্ছে...
           </p>
@@ -128,21 +128,21 @@ export default function CategoryPage({
   const categoryIcon = products[0]?.categoryIcon;
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-6">
+    <main className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-6 sm:py-6 lg:px-8">
 
       {/* Category Header */}
-      <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-xl">
+      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xl sm:h-12 sm:w-12 sm:text-2xl">
             {categoryIcon}
           </div>
 
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">
-              {categoryName}
+          <div className="min-w-0">
+            <h1 className="break-words text-base font-bold text-gray-900 sm:text-lg">
+              {categoryName || "পণ্য পাওয়া যায়নি"}
             </h1>
 
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs leading-5 text-gray-500 sm:text-sm">
               আজকের {categoryName} এর বাজার দর
             </p>
           </div>
@@ -153,20 +153,19 @@ export default function CategoryPage({
       <section className="mt-5">
 
         {/* Products Header + Sort */}
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-gray-700">
+        <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+          <p className="text-xs font-medium text-gray-700 sm:text-sm">
             মোট {toBanglaNumber(products.length)}টি পণ্য দেখানো হচ্ছে
           </p>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={sortOption}
               onChange={(event) => setSortOption(event.target.value)}
-              className="appearance-none rounded-lg border border-gray-200 bg-white py-2 pl-3 pr-9 text-xs font-medium text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
+              aria-label="পণ্যের দাম অনুযায়ী সাজান"
+              className="w-full appearance-none rounded-lg border border-gray-200 bg-white py-2.5 pl-3 pr-9 text-xs font-medium text-gray-700 outline-none transition hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100 sm:w-auto sm:min-w-[170px]"
             >
-              <option value="default">
-                ডিফল্ট
-              </option>
+              <option value="default">ডিফল্ট</option>
 
               <option value="low-to-high">
                 দাম: কম থেকে বেশি
@@ -185,19 +184,27 @@ export default function CategoryPage({
         </div>
 
         {/* Product Cards */}
-        <div className="grid grid-cols-1 gap-4 pb-5 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedProducts.map((product) => (
-            <PriceCard
-              key={product.id}
-              productId={String(product.id)}
-              nameBn={product.nameBn}
-              today={bengaliToNumber(product.today)}
-              unit={product.unit}
-              image={product.image}
-              change={product.change}
-            />
-          ))}
-        </div>
+        {sortedProducts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3 pb-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+            {sortedProducts.map((product) => (
+              <PriceCard
+                key={product.id}
+                productId={String(product.id)}
+                nameBn={product.nameBn}
+                today={bengaliToNumber(product.today)}
+                unit={product.unit}
+                image={product.image}
+                change={product.change}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-10 text-center sm:rounded-2xl">
+            <p className="text-sm text-gray-500">
+              এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি।
+            </p>
+          </div>
+        )}
 
       </section>
     </main>
