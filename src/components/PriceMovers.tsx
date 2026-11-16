@@ -49,14 +49,25 @@ export default function PriceSections() {
     return null;
   }
 
-  const increasedProducts = products.filter(
-    (product) => product.change.dir === "up"
-  );
+  // Top 6 products with the highest price increase
+  const increasedProducts = products
+    .filter((product) => product.change.dir === "up")
+    .sort(
+      (a, b) =>
+        Math.abs(b.change.pct) - Math.abs(a.change.pct)
+    )
+    .slice(0, 6);
 
-  const decreasedProducts = products.filter(
-    (product) => product.change.dir === "down"
-  );
+  // Top 6 products with the highest price decrease
+  const decreasedProducts = products
+    .filter((product) => product.change.dir === "down")
+    .sort(
+      (a, b) =>
+        Math.abs(b.change.pct) - Math.abs(a.change.pct)
+    )
+    .slice(0, 6);
 
+  // All products
   const allProducts = products.slice(0, 33);
 
   const renderProducts = (items: Product[]) => (
