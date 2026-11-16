@@ -6,7 +6,7 @@ import PriceCard from "@/components/PriceCard";
 import { toBanglaNumber } from "@/app/Banglahelper";
 
 interface Product {
-  id: string;
+  id: number;
   slug: string;
   nameBn: string;
   category: string;
@@ -129,6 +129,7 @@ export default function CategoryPage({
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6">
+
       {/* Category Header */}
       <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-3">
@@ -150,6 +151,7 @@ export default function CategoryPage({
 
       {/* Products */}
       <section className="mt-5">
+
         {/* Products Header + Sort */}
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="text-sm font-medium text-gray-700">
@@ -162,7 +164,9 @@ export default function CategoryPage({
               onChange={(event) => setSortOption(event.target.value)}
               className="appearance-none rounded-lg border border-gray-200 bg-white py-2 pl-3 pr-9 text-xs font-medium text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
             >
-              <option value="default">ডিফল্ট</option>
+              <option value="default">
+                ডিফল্ট
+              </option>
 
               <option value="low-to-high">
                 দাম: কম থেকে বেশি
@@ -185,15 +189,16 @@ export default function CategoryPage({
           {sortedProducts.map((product) => (
             <PriceCard
               key={product.id}
-              productId={product.id}
+              productId={String(product.id)}
               nameBn={product.nameBn}
               today={bengaliToNumber(product.today)}
               unit={product.unit}
-              categoryIcon={product.categoryIcon}
+              image={product.image}
               change={product.change}
             />
           ))}
         </div>
+
       </section>
     </main>
   );

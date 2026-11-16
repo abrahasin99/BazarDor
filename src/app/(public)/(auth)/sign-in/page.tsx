@@ -16,11 +16,56 @@ import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
+function GoogleIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        fill="#4285F4"
+        d="M21.35 12.27c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.93v2.43h3.14c1.84-1.69 2.92-4.18 2.92-7.39z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 21.75c2.63 0 4.84-.87 6.45-2.35l-3.14-2.43c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.72-5.46-4.03H3.3v2.51A9.74 9.74 0 0 0 12 21.75z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.54 13.87A5.85 5.85 0 0 1 6.23 12c0-.65.11-1.28.31-1.87V7.62H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.38l3.24-2.51z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 6.1c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.18 14.62 2.25 12 2.25A9.74 9.74 0 0 0 3.3 7.62l3.24 2.51C7.31 7.82 9.46 6.1 12 6.1z"
+      />
+    </svg>
+  );
+}
+
+function GithubIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12 2C6.477 2 2 6.486 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.866-.013-1.7-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.071 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.56 9.56 0 0 1 2.504.337c1.909-1.296 2.748-1.026 2.748-1.026.546 1.378.202 2.397.1 2.65.64.701 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.486 17.523 2 12 2Z" />
+    </svg>
+  );
+}
+
 export default function SignInPage() {
   const [isVisible, setIsVisible] = useState(false);
 
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.SyntheticEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
 
@@ -39,7 +84,19 @@ export default function SignInPage() {
     const data = await signIn.social({
       provider: "google",
     });
+
     console.log(data);
+  };
+
+  const handleGithubSignIn = async () => {
+    const { error } = await signIn.social({
+      provider: "github",
+      callbackURL: "/",
+    });
+
+    if (error) {
+      toast.error(error.message as string);
+    }
   };
 
   return (
@@ -58,7 +115,10 @@ export default function SignInPage() {
       {/* Sign In Card */}
       <Card className="w-full max-w-[432px] bg-[#fbfdfb] border border-[#dce5dc] rounded-2xl p-6 sm:p-7 shadow-none">
         <Card.Content className="flex flex-col gap-4 p-0">
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4"
+          >
             {/* Email */}
             <TextField
               name="email"
@@ -99,11 +159,17 @@ export default function SignInPage() {
 
                 <button
                   type="button"
-                  onClick={() => setIsVisible((prev) => !prev)}
+                  onClick={() =>
+                    setIsVisible((prev) => !prev)
+                  }
                   className="absolute right-3 text-[#737c74] hover:text-green-700 focus:outline-none transition-colors"
                   aria-label="Toggle password visibility"
                 >
-                  {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {isVisible ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
 
@@ -133,42 +199,36 @@ export default function SignInPage() {
           {/* Divider */}
           <div className="w-full flex items-center gap-4">
             <Separator className="flex-1 bg-[#dce5dc]" />
-            <span className="text-xs text-[#737c74]">অথবা</span>
+
+            <span className="text-xs text-[#737c74]">
+              অথবা
+            </span>
+
             <Separator className="flex-1 bg-[#dce5dc]" />
           </div>
 
-          {/* Google Login */}
-          <Button
-            type="button"
-            onClick={handleGoogleSignIn}
-            variant="outline"
-            className="w-full h-[42px] flex items-center justify-center gap-2 border border-[#dce5dc] rounded-lg bg-transparent hover:bg-[#f0f5f0] text-[#1f2923] font-semibold text-xs sm:text-sm shadow-none transition"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 48 48"
-              className="w-5 h-5 shrink-0"
+          {/* Social Sign In */}
+          <div className="space-y-3">
+            {/* Google */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
             >
-              <path
-                fill="#EA4335"
-                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-              />
-              <path
-                fill="#4285F4"
-                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-              />
-              <path
-                fill="#34A853"
-                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-              />
-            </svg>
+              <GoogleIcon />
+              Continue with Google
+            </button>
 
-            <span>Sign in with Google</span>
-          </Button>
+            {/* GitHub */}
+            <button
+              type="button"
+              onClick={handleGithubSignIn}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            >
+              <GithubIcon />
+              Continue with GitHub
+            </button>
+          </div>
         </Card.Content>
 
         {/* Footer */}
@@ -188,6 +248,7 @@ export default function SignInPage() {
             className="flex items-center gap-1.5 text-sm text-[#7b857d] hover:text-green-700 transition"
           >
             <ArrowLeft size={14} />
+
             <span>হোম পেজে ফিরে যান</span>
           </Link>
         </Card.Footer>

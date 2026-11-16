@@ -63,10 +63,10 @@ export default function CategoryBar() {
               <Link
                 key={category.id}
                 href={`/category/${category.slug}`}
-                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-1 py-1 text-xs font-medium transition ${
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-2xl px-2 py-2 text-xs font-medium transition ${
                   isActive
-                    ? "bg-green-50 text-green-700"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-green-600"
+                    ? "bg-green-800 text-white"
+                    : "text-gray-700 hover:bg-gray-200 hover:text-green-600"
                 }`}
               >
                 <span>{category.icon}</span>

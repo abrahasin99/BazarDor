@@ -5,12 +5,12 @@ import PriceCard from "./PriceCard";
 import { CaretDown, CaretUp } from "@gravity-ui/icons";
 
 interface Product {
-  id: string;
+  id: number;
   nameBn: string;
   today: number;
   unit: string;
   category: string;
-  categoryIcon?: React.ReactNode;
+  image: string;
   change: {
     dir: "up" | "down" | "flat";
     pct: number;
@@ -49,16 +49,13 @@ export default function PriceSections() {
     return null;
   }
 
-  // Top 6 products with the highest price increase
+  // Top 6 price increases
   const increasedProducts = products
     .filter((product) => product.change.dir === "up")
-    .sort(
-      (a, b) =>
-        Math.abs(b.change.pct) - Math.abs(a.change.pct)
-    )
+    .sort((a, b) => b.change.pct - a.change.pct)
     .slice(0, 6);
 
-  // Top 6 products with the highest price decrease
+  // Top 6 price decreases
   const decreasedProducts = products
     .filter((product) => product.change.dir === "down")
     .sort(
@@ -75,11 +72,11 @@ export default function PriceSections() {
       {items.map((product) => (
         <PriceCard
           key={product.id}
-          productId={product.id}
+          productId={String(product.id)}
           nameBn={product.nameBn}
           today={product.today}
           unit={product.unit}
-          categoryIcon={product.categoryIcon}
+          image={product.image}
           change={product.change}
         />
       ))}

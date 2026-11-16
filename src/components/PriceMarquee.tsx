@@ -53,7 +53,7 @@ export default function PriceMarquee() {
 
   return (
     <div className="border-b border-gray-200 bg-white">
-      <Marquee speed={65} pauseOnHover={true} gradient={false}>
+      <Marquee speed={100} pauseOnHover={true} gradient={false}>
         {products
           .filter((product) => product.change.dir !== "flat")
           .map((product) => (

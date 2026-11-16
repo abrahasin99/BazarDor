@@ -11,18 +11,34 @@ import {
   Separator,
   TextField,
 } from "@heroui/react";
-import { User, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { signIn, signUp } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
+function GithubIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12 2C6.477 2 2 6.486 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.866-.013-1.7-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.071 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.688 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.56 9.56 0 0 1 2.504.337c1.909-1.296 2.748-1.026 2.748-1.026.546 1.378.202 2.397.1 2.65.64.701 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.486 17.523 2 12 2Z" />
+    </svg>
+  );
+}
 
 export default function SignUpPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.SyntheticEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     setPasswordError("");
 
@@ -34,7 +50,6 @@ export default function SignUpPage() {
       return;
     }
 
-    // Existing Better Auth registration functionality
     const { data: resData, error } = await signUp.email({
       email: data.email as string,
       password: data.password as string,
@@ -43,19 +58,38 @@ export default function SignUpPage() {
 
     if (error) {
       toast.error(error.message as string);
+      return;
     }
 
-    if (resData?.user.name) {
+    if (resData?.user) {
       toast.success("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। সাইন ইন করুন।");
       router.push("/sign-in");
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    const data = await signIn.social({
+  const handleGoogleSignUp = async () => {
+    const { error } = await signIn.social({
       provider: "google",
+      callbackURL: "/",
     });
 
+    if (error) {
+      toast.error(error.message as string);
+    }
+  };
+
+  const handleGithubSignUp = async () => {
+    const { error } = await signIn.social({
+      provider: "github",
+      callbackURL: "/",
+      additionalParams: {
+        prompt: "select_account",
+      },
+    });
+
+    if (error) {
+      toast.error(error.message as string);
+    }
   };
 
   return (
@@ -86,12 +120,10 @@ export default function SignUpPage() {
                 পূর্ণ নাম
               </Label>
 
-              <div className="relative flex items-center">
-                <Input
-                  placeholder="আপনার পূর্ণ নাম লিখুন"
-                  className="w-full h-[42px] px-3 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
-                />
-              </div>
+              <Input
+                placeholder="আপনার পূর্ণ নাম লিখুন"
+                className="w-full h-[42px] px-3 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
+              />
 
               <FieldError className="text-xs text-red-500" />
             </TextField>
@@ -107,12 +139,10 @@ export default function SignUpPage() {
                 ইমেইল
               </Label>
 
-              <div className="relative flex items-center">
-                <Input
-                  placeholder="you@example.com"
-                  className="w-full h-[42px] px-3 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
-                />
-              </div>
+              <Input
+                placeholder="you@example.com"
+                className="w-full h-[42px] px-3 rounded-lg border border-[#dce5dc] bg-transparent text-sm text-[#1f2923] placeholder:text-[#737c74] hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-100 focus:bg-transparent outline-none transition"
+              />
 
               <FieldError className="text-xs text-red-500" />
             </TextField>
@@ -202,7 +232,7 @@ export default function SignUpPage() {
           {/* Google Sign Up */}
           <Button
             type="button"
-            onClick={handleGoogleSignIn}
+            onClick={handleGoogleSignUp}
             variant="outline"
             className="w-full h-[42px] flex items-center justify-center gap-2 border border-[#dce5dc] rounded-lg bg-transparent hover:bg-[#f0f5f0] text-[#1f2923] font-semibold text-xs sm:text-sm shadow-none transition"
           >
@@ -230,6 +260,17 @@ export default function SignUpPage() {
             </svg>
 
             <span>Sign up with Google</span>
+          </Button>
+
+          {/* GitHub Sign Up */}
+          <Button
+            type="button"
+            onClick={handleGithubSignUp}
+            variant="outline"
+            className="w-full h-[42px] flex items-center justify-center gap-2 border border-[#dce5dc] rounded-lg bg-transparent hover:bg-[#f0f5f0] text-[#1f2923] font-semibold text-xs sm:text-sm shadow-none transition"
+          >
+            <GithubIcon />
+            <span>Sign up with GitHub</span>
           </Button>
         </Card.Content>
 
